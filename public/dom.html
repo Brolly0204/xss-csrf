@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>首页</title>
+</head>
+<body>
+  <input type="text" id="web">
+  <button id="add">添加图片</button>
+  <div class="box"></div>
+  <script src="/node_modules/jquery/dist/jquery.min.js"></script>
+  <script>
+    // XSS DOM型
+  $(function() {
+    $('#add').on('click', function() {
+      // "xxx" onerror="alert(1)" 
+      // "><script>alert(123)<\/script>
+      $('.box').html(`<img src="${encodeURI($('#web').val())}" alt=""/>`)
+    })
+  })
+  </script>
+</body>
+</html>

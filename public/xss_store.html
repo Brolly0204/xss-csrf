@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>评论页面</title>
+    <link
+      rel="stylesheet"
+      href="/node_modules/bootstrap/dist/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="col-md-6 col-md-offset-3">
+            <div class="panel panel-danger">
+              <div class="panel-heading">
+                <h2>评论页面</h2>
+              </div>
+              <div class="panel-body">
+                <ul class="list-group">
+
+                </ul>
+              </div>
+              <div class="panel-footer">
+                <form id="form" onsubmit="addComment(event)">
+                  <div class="form-group">
+                    <label for="text" class="control-label">内容</label>
+                    <input type="text" id="text" class="form-control" />
+                  </div>
+                  <div class="form-group">
+                    <input type="submit" value="发表" class="btn btn-primary" />
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="/node_modules/jquery/dist/jquery.min.js"></script>
+    <script>
+      function getList() {
+        $.get('/api/list').then(res => {
+          if (res.code === 0) {
+           let htmlStr = res.comments.map(item => (
+            `<li class="list-group-item">${item.content} <i>作者：${item.username}</i></li>`
+           ))
+           $('.list-group').html(htmlStr)
+          }
+        })
+      }
+
+      getList()
+
+      function encodeHtml(str) {
+        return str.replace(/&/g, '&amp;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&apos;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+      }
+
+      // 1.客户端传递给服务器 需要校验过滤下
+      // XSS 存储型 恶意脚本存储到服务器上，所有人访问都会造成攻击
+      function addComment(e) {
+        e.preventDefault()
+        let content = encodeHtml($('#text').val())
+        $.post('/api/addcomment', { content }).then(res => {
+          console.log(res)
+          if (res.code === 1) {
+            alert(res.msg)
+            location.href = '/login.html'
+          } else {
+            $('#text').val('')
+            getList()
+          }
+        })
+      }
+    </script>
+  </body>
+</html>
